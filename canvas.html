@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+    <input type="file" id="datoteka">
+    <canvas id="canvas" width="1000px" height="700px" style="background-color: #ddd">
+
+
+    </canvas>
+</body>
+
+<script>
+    
+    var vsebina;
+    var canvas = document.querySelector("#canvas");
+    var context = canvas.getContext("2d");
+
+
+    function readFile(event) {
+        var file = event.target.files[0];
+        var trikotniki;
+        var tocke = new Array(4);
+        for (var j = 0; j < tocke.length; j++) {
+            tocke[j] = new Array(1);
+        }
+
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(res) {
+                vsebina = res.target.result.split("\n");
+                getTocke(vsebina);
+                getTrikotniki(vsebina);
+                var prvi = true;
+
+                
+                /* for (var i = 0; i < vsebina.length; i++) {
+                    var tocke = vsebina[i].split(" ");
+
+                    var x = parseFloat(tocke[1]);
+                    var y = parseFloat(tocke[2]);
+                    var z = parseFloat(tocke[3]);
+
+                    tocke[0][i] = i + 1;
+                    tocke[1][i] = x;
+                    tocke[2][i] = y;
+                    tocke[3][i] = z;
+                    console.log(typeof tocke[0][1]);
+                    console.log("TOCKE: %d %f %f %f\n", tocke[0][i], tocke[1][i], tocke[2][i], tocke[3][i]);
+
+                } */
+                
+            }
+            reader.readAsText(file);
+        } else {
+            alert("failed");
+        }
+    }
+
+    document.getElementById("datoteka").addEventListener("change", readFile, false);
+
+
+    function getTocke(content) {
+        for (var i = 0; i < content.length; i++) {
+            if (content[i][0] === 'v') {
+                //We have a record of a point
+                var tocke = content[i].split(" ");
+                var x = parseFloat(tocke[1]);
+                var y = parseFloat(tocke[2]);
+                var z = parseFloat(tocke[3]);
+
+                context.fillRect(x, y, 4, 4);
+                console.log("%c %f %f %f\n", tocke[0], x, y, z);
+            }
+        }
+    }
+
+    function getTrikotniki(content) {
+        for (var i = 0; i < content.length; i++) {
+            if (content[i][0] === 'f') {
+                // We have a record of a triangle edges
+                var stranice = content[i].split(" ");
+                var first = parseInt(stranice[1]);
+                var second = parseInt(stranice[2]);
+                var third = parseInt(stranice[3]);
+
+                console.log("STRANICE: %d %d %d\n", first, second, third);
+
+                getRecord(content, first - 1);
+                getRecord(content, second - 1);
+                getRecord(content, third - 1);
+            }
+        }
+    }
+
+    function getRecord(context, i) {
+        var record = context[i].split(" ");
+        var rec = [record[1], record[2], record[3]];
+        console.log(rec);
+    }
+
+    function drawLine(rec) {
+        
+    }
+
+</script>
