@@ -85,9 +85,23 @@
 
                 console.log("STRANICE: %d %d %d\n", first, second, third);
 
-                getRecord(content, first - 1);
-                getRecord(content, second - 1);
-                getRecord(content, third - 1);
+                var ena = getRecord(content, first - 1);
+                var dva = getRecord(content, second - 1);
+                var tri = getRecord(content, third - 1);
+                console.log(ena);
+                console.log(dva);
+                console.log(tri);
+                context.moveTo(ena[0], ena[1]);
+                context.lineTo(dva[0], dva[1]);
+                context.stroke();
+
+                context.moveTo(dva[0], dva[1]);
+                context.lineTo(tri[0], tri[1]);
+                context.stroke();
+
+                context.moveTo(tri[0], tri[1]);
+                context.lineTo(ena[0], ena[1]);
+                context.stroke();
             }
         }
     }
@@ -95,7 +109,9 @@
     function getRecord(context, i) {
         var record = context[i].split(" ");
         var rec = [record[1], record[2], record[3]];
+        console.log("REC:\n");
         console.log(rec);
+        return rec;
     }
 
     function drawLine(rec) {
