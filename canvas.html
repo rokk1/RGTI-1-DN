@@ -10,45 +10,30 @@
 </body>
 
 <script>
-    
     var vsebina;
     var canvas = document.querySelector("#canvas");
     var context = canvas.getContext("2d");
+    context.translate(canvas.width/2,canvas.height/2);
 
-
+    let points = new Array(1);
+    let index = 0;
+    let triangles = new Array(1);
+    let indexTriangles = 0;
+    console.log(points);
     function readFile(event) {
         var file = event.target.files[0];
         var trikotniki;
-        var tocke = new Array(4);
-        for (var j = 0; j < tocke.length; j++) {
-            tocke[j] = new Array(1);
-        }
-
+        
+       // console.log(points);
         if (file) {
             var reader = new FileReader();
             reader.onload = function(res) {
                 vsebina = res.target.result.split("\n");
                 getTocke(vsebina);
+                
                 getTrikotniki(vsebina);
-                var prvi = true;
-
                 
-                /* for (var i = 0; i < vsebina.length; i++) {
-                    var tocke = vsebina[i].split(" ");
-
-                    var x = parseFloat(tocke[1]);
-                    var y = parseFloat(tocke[2]);
-                    var z = parseFloat(tocke[3]);
-
-                    tocke[0][i] = i + 1;
-                    tocke[1][i] = x;
-                    tocke[2][i] = y;
-                    tocke[3][i] = z;
-                    console.log(typeof tocke[0][1]);
-                    console.log("TOCKE: %d %f %f %f\n", tocke[0][i], tocke[1][i], tocke[2][i], tocke[3][i]);
-
-                } */
-                
+                draw();
             }
             reader.readAsText(file);
         } else {
@@ -67,9 +52,11 @@
                 var x = parseFloat(tocke[1]);
                 var y = parseFloat(tocke[2]);
                 var z = parseFloat(tocke[3]);
-
-                context.fillRect(x, y, 4, 4);
-                console.log("%c %f %f %f\n", tocke[0], x, y, z);
+                //console.log(points);
+                var trenutneTocke = [x, y, z, 1];
+                points[index] = trenutneTocke;
+                index++;
+                
             }
         }
     }
@@ -82,40 +69,35 @@
                 var first = parseInt(stranice[1]);
                 var second = parseInt(stranice[2]);
                 var third = parseInt(stranice[3]);
-
-                console.log("STRANICE: %d %d %d\n", first, second, third);
-
-                var ena = getRecord(content, first - 1);
-                var dva = getRecord(content, second - 1);
-                var tri = getRecord(content, third - 1);
-                console.log(ena);
-                console.log(dva);
-                console.log(tri);
-                context.moveTo(ena[0], ena[1]);
-                context.lineTo(dva[0], dva[1]);
-                context.stroke();
-
-                context.moveTo(dva[0], dva[1]);
-                context.lineTo(tri[0], tri[1]);
-                context.stroke();
-
-                context.moveTo(tri[0], tri[1]);
-                context.lineTo(ena[0], ena[1]);
-                context.stroke();
+                
+                //console.log("STRANICE: %d %d %d\n", first, second, third);
+                
+                var trenutniTriangle = [first, second, third];
+                triangles[indexTriangles] = trenutniTriangle;
+                indexTriangles++;
             }
         }
     }
 
-    function getRecord(context, i) {
-        var record = context[i].split(" ");
-        var rec = [record[1], record[2], record[3]];
-        console.log("REC:\n");
-        console.log(rec);
-        return rec;
-    }
+    // Function to draw shapes from points array and triangles array
+    function draw() {
+        // DRAW POINTS
+        for (var i = 0; i < points.length; i++) {
+            context.fillRect(points[i][0], points[i][1], 4, 4);
+        }
 
-    function drawLine(rec) {
-        
+        // DRAW TRIANGLES
+        for (var i = 0; i < triangles.length; i++) {
+            context.moveTo(points[triangles[i][0] - 1][0], points[triangles[i][0] - 1][1]);
+            context.lineTo(points[triangles[i][1] - 1][0], points[triangles[i][1] - 1][1]);
+
+            context.moveTo(points[triangles[i][1] - 1][0], points[triangles[i][1] - 1][1]);
+            context.lineTo(points[triangles[i][2] - 1][0], points[triangles[i][2] - 1][1]);
+
+            context.moveTo(points[triangles[i][2] - 1][0], points[triangles[i][2] - 1][1]);
+            context.lineTo(points[triangles[i][0] - 1][0], points[triangles[i][0] - 1][1]);
+            context.stroke();
+        }
     }
 
 </script>
