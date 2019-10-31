@@ -111,11 +111,11 @@
                             break;
                         case 102:
                             // rotate right -> key numpad 6
-                            rotateY(0.08);
+                            rotateY(0.05);
                             break;
                         case 100:
                             // rotate left -> key numpad 4
-                            rotateY(-0.08);
+                            rotateY(-0.05);
                             break;
                         case 107:
                             // scale positive -> key +
@@ -127,19 +127,19 @@
                             break;
                         case 104:
                             // rotate up -> key numpad 8
-                            rotateX(0.08); 
+                            rotateX(0.05); 
                            break;
                         case 98:
                             // rotate down -> key numpad 2
-                            rotateX(-0.08);
+                            rotateX(-0.05);
                             break;
                         case 97:
                             // rotate around z axis (neg) -> key numpad 1
-                            rotateZ(-0.08);
+                            rotateZ(-0.05);
                             break;
                         case 105:
                             // rotate around z axis (pos) -> key numpad 9
-                            rotateZ(0.08);
+                            rotateZ(0.05);
                             break;
                         default:
                             break;
@@ -159,13 +159,16 @@
 
 
     function getTocke(content) {
+        // points are in range from -1 to 1 (x axis and y axis)
+        // -1 (x axis) = -600px, 1 (x axis) = 600px
+        // -1 (y axis) = -450px, 1 (y axis) = 450px
         for (var i = 0; i < content.length; i++) {
             if (content[i][0] === 'v') {
                 //We have a record of a point
                 var tocke = content[i].split(" ");
-                var x = parseFloat(tocke[1]);
-                var y = parseFloat(tocke[2]);
-                var z = parseFloat(tocke[3]);
+                var x = parseFloat(tocke[1]) * 300;
+                var y = parseFloat(tocke[2]) * 225;
+                var z = parseFloat(tocke[3]) * 272;
                 //console.log(points);
                 var trenutneTocke = [x, y, z, 1];
                 points[index] = trenutneTocke;
