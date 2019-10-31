@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <head>
-    <script src="gl-matrix.js"></script>
 </head>
 <body>
     <input type="file" id="datoteka">
@@ -40,29 +39,21 @@
 
     var rotationXMatrix = 
             [
-             [0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0, 0]
+             [1, 0, 0, 0],
+             [0, 1, 0, 0],
+             [0, 0, 1, 0],
+             [0, 0, 0, 1]
             ];
 
     var rotationYMatrix = 
             [
-             [0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0, 0]
+             [1, 0, 0, 0],
+             [0, 1, 0, 0],
+             [0, 0, 1, 0],
+             [0, 0, 0, 1]
             ];
 
     var rotationZMatrix = 
-            [
-             [0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0, 0],
-             [0, 0, 0, 0]
-            ];
-    
-    var scalationMatrix = 
             [
              [1, 0, 0, 0],
              [0, 1, 0, 0],
@@ -70,7 +61,6 @@
              [0, 0, 0, 1]
             ];
             
-
 
     function readFile(event) {
         var file = event.target.files[0];
@@ -86,63 +76,86 @@
                 getTrikotniki(vsebina);
                 
                 context.beginPath();
-                console.log(triangles);
-                console.log(points);
                 draw();
 
 
                 document.addEventListener("keydown", event => {
+                    var R = [
+                        [1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1]
+                    ];
+                    var T = [
+                        [1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1]
+                    ];
+                    var S = [
+                        [1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1]
+                    ];
                     switch (event.keyCode) {
                         case 38:
                             // move up -> key arrow up
-                            translate(0, -5, 0);
+                            T = translate(0, -5, 0);
                             break;
                         case 40:
                             // move down -> key arrow down
-                            translate(0, 5, 0);
+                            T = translate(0, 5, 0);
                             break;
                         case 39:
                             // move right -> key arrow right
-                            translate(5, 0, 0);
+                            T = translate(5, 0, 0);
                             break;
                         case 37:
                             // move left -> key arrow left
-                            translate(-5, 0, 0);
+                            T = translate(-5, 0, 0);
                             break;
                         case 102:
                             // rotate right -> key numpad 6
-                            rotateY(0.05);
+                            R = rotateY(0.05);
                             break;
                         case 100:
                             // rotate left -> key numpad 4
-                            rotateY(-0.05);
+                            R = rotateY(-0.05);
                             break;
                         case 107:
                             // scale positive -> key +
-                            scale(1.0111, 1.0111, 1.0111);
+                            S = scale(1.0111, 1.0111, 1.0111);
                             break;
                         case 109:
                             // scale negative -> key -
-                            scale(0.99, 0.99, 0.99);
+                            S = scale(0.99, 0.99, 0.99);
                             break;
                         case 104:
                             // rotate up -> key numpad 8
-                            rotateX(0.05); 
+                            R = rotateX(-0.05); 
                            break;
                         case 98:
                             // rotate down -> key numpad 2
-                            rotateX(-0.05);
+                            R = rotateX(0.05);
                             break;
                         case 97:
                             // rotate around z axis (neg) -> key numpad 1
-                            rotateZ(-0.05);
+                            R = rotateZ(-0.05);
                             break;
                         case 105:
                             // rotate around z axis (pos) -> key numpad 9
-                            rotateZ(0.05);
+                            R = rotateZ(0.05);
                             break;
                         default:
                             break;
+                    }
+                    var SR = multiply4x4(S, R);
+                    var transformationMatrix = multiply4x4(SR, T);
+                    console.log(transformationMatrix);
+                    for (var k = 0; k < points.length; k++) {
+                        var pointsVector = points[k];
+                        points[k] = multiply4x1(transformationMatrix, pointsVector);
                     }
                     draw();
                 });
@@ -198,83 +211,58 @@
     }
 
     function scale(sx, sy, sz) {
-        scalationMatrix = 
+        var scalationMatrix = 
             [
              [sx, 0, 0, 0],
              [0, sy, 0, 0],
              [0, 0, sz, 0],
              [0, 0, 0, 1]
             ];
-        for (var k = 0; k < points.length; k++) {
-            var pointsVector = points[k];
-            points[k] = multiply4x1(scalationMatrix, pointsVector);
-        }
+        return scalationMatrix;
     }
 
     function rotateX(alpha) {
-        rotationXMatrix = 
+        var rotationXMatrix = 
             [
              [1, 0, 0, 0],
              [0, Math.cos(alpha), -Math.sin(alpha), 0],
              [0, Math.sin(alpha), Math.cos(alpha), 0],
              [0, 0, 0, 1]
             ];
-        for (var k = 0; k < points.length; k++) {
-            var pointsVector = points[k];
-            console.log(pointsVector);
-            points[k] = multiply4x1(rotationXMatrix, pointsVector);
-
-        }
+        return rotationXMatrix;
     }
 
     function rotateY(alpha) {
-        rotationYMatrix = 
+        var rotationYMatrix = 
             [
              [Math.cos(alpha), 0, Math.sin(alpha), 0],
              [0, 1, 0, 0],
              [-Math.sin(alpha), 0, Math.cos(alpha), 0],
              [0, 0, 0, 1]
             ];
-        for (var k = 0; k < points.length; k++) {
-            var pointsVector = points[k];
-            console.log(pointsVector);
-            points[k] = multiply4x1(rotationYMatrix, pointsVector);
-
-        }
+        return rotationYMatrix;
     }
 
     function rotateZ(alpha) {
-        rotationZMatrix = 
+        var rotationZMatrix = 
             [
              [Math.cos(alpha), -Math.sin(alpha), 0, 0],
              [Math.sin(alpha), Math.cos(alpha), 0, 0],
              [0, 0, 1, 0],
              [0, 0, 0, 1]
             ];
-        for (var k = 0; k < points.length; k++) {
-            var pointsVector = points[k];
-            console.log(pointsVector);
-            points[k] = multiply4x1(rotationZMatrix, pointsVector);
-
-        }
+        return rotationZMatrix;
     }
 
     function translate(dx, dy, dz) {
-        translationMatrix = 
+        var translationMatrix = 
             [
              [1, 0, 0, dx],
              [0, 1, 0, dy],
              [0, 0, 1, dz],
              [0, 0, 0, 1]
             ];
-        // TRANSPOSE MATRIX OF POINTS
-        for (var k = 0; k < points.length; k++) {
-            var pointsVector = points[k];
-            console.log(pointsVector);
-            points[k] = multiply4x1(translationMatrix, pointsVector);
-
-        }
-        draw();
+        return translationMatrix;
     }
 
     function multiply4x4 (a, b) {
